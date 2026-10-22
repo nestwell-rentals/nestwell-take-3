@@ -53,10 +53,11 @@ const BeforeDashboard: React.FC<ServerProps> = ({ user }) => {
           {' to add, move and resize widgets such as "Pending comments".'}
         </li>
         <li>
-          {'Connect an AI agent over MCP: create an API key on your '}
+          {'Connect ChatGPT or another AI agent over MCP: add '}
+          <code>/api/mcp</code>
+          {' as a connector with OAuth and sign in, or create an API key on your '}
           <PayloadLink href={`/admin/collections/users/${user?.id ?? ''}`}>account</PayloadLink>
-          {' and point your MCP client at '}
-          <code>/api/mcp</code>.
+          {'. Your account also lists the connected apps, with a Revoke button each.'}
         </li>
         <li>
           {'Change the '}

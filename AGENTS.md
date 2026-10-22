@@ -56,6 +56,7 @@ For Payload API details, read the skill that ships with Payload: `node_modules/p
 - Preserve the seeded-content workflow and the comment approval flow unless the task explicitly changes them.
 - Seed behavior must stay deterministic: all seed media is bundled in `src/endpoints/seed/assets`, with no network downloads.
 - Keep the security guarantees covered by the e2e suite: no public drafts or commenter emails, no self-approved comments, and a demo author that cannot log in.
+- Keep the OAuth sign-in for `/api/mcp` intact (`src/plugins/mcp-oauth`): anonymous MCP requests get a 401 with a `WWW-Authenticate` challenge, PKCE S256 is mandatory, codes and refresh tokens are single-use, only hashes are stored, redirect URIs must be https or loopback and match exactly, and the `oauth-*` collections stay hidden from the admin, REST, GraphQL and MCP. User API keys must keep working alongside OAuth.
 
 ## Audit And Security Rules
 

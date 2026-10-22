@@ -141,6 +141,10 @@ export interface Config {
     forms: Form;
     'form-submissions': FormSubmission;
     search: Search;
+    'oauth-clients': OauthClient;
+    'oauth-authorization-codes': OauthAuthorizationCode;
+    'oauth-grants': OauthGrant;
+    'oauth-tokens': OauthToken;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -167,6 +171,10 @@ export interface Config {
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
+    'oauth-clients': OauthClientsSelect<false> | OauthClientsSelect<true>;
+    'oauth-authorization-codes': OauthAuthorizationCodesSelect<false> | OauthAuthorizationCodesSelect<true>;
+    'oauth-grants': OauthGrantsSelect<false> | OauthGrantsSelect<true>;
+    'oauth-tokens': OauthTokensSelect<false> | OauthTokensSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -981,6 +989,87 @@ export interface Search {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-clients".
+ */
+export interface OauthClient {
+  id: number;
+  clientId: string;
+  clientName: string;
+  registrationType: 'dynamic' | 'metadata_document';
+  tokenEndpointAuthMethod: 'none' | 'client_secret_basic' | 'client_secret_post';
+  clientSecretHash?: string | null;
+  redirectUris: string[];
+  clientUri?: string | null;
+  logoUri?: string | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  metadataExpiresAt?: string | null;
+  lastUsedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-authorization-codes".
+ */
+export interface OauthAuthorizationCode {
+  id: number;
+  codeHash: string;
+  client: number | OauthClient;
+  user: number | User;
+  grant?: (number | null) | OauthGrant;
+  redirectUri: string;
+  codeChallenge: string;
+  codeChallengeMethod: 'S256';
+  resource: string;
+  scope?: string | null;
+  expiresAt: string;
+  usedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-grants".
+ */
+export interface OauthGrant {
+  id: number;
+  client: number | OauthClient;
+  user: number | User;
+  resource: string;
+  scope?: string | null;
+  lastUsedAt?: string | null;
+  revokedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-tokens".
+ */
+export interface OauthToken {
+  id: number;
+  type: 'access' | 'refresh';
+  tokenHash: string;
+  grant: number | OauthGrant;
+  client: number | OauthClient;
+  user: number | User;
+  resource: string;
+  scope?: string | null;
+  expiresAt: string;
+  usedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1164,6 +1253,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'search';
         value: number | Search;
+      } | null)
+    | ({
+        relationTo: 'oauth-clients';
+        value: number | OauthClient;
+      } | null)
+    | ({
+        relationTo: 'oauth-authorization-codes';
+        value: number | OauthAuthorizationCode;
+      } | null)
+    | ({
+        relationTo: 'oauth-grants';
+        value: number | OauthGrant;
+      } | null)
+    | ({
+        relationTo: 'oauth-tokens';
+        value: number | OauthToken;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1840,6 +1945,75 @@ export interface SearchSelect<T extends boolean = true> {
         title?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-clients_select".
+ */
+export interface OauthClientsSelect<T extends boolean = true> {
+  clientId?: T;
+  clientName?: T;
+  registrationType?: T;
+  tokenEndpointAuthMethod?: T;
+  clientSecretHash?: T;
+  redirectUris?: T;
+  clientUri?: T;
+  logoUri?: T;
+  metadata?: T;
+  metadataExpiresAt?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-authorization-codes_select".
+ */
+export interface OauthAuthorizationCodesSelect<T extends boolean = true> {
+  codeHash?: T;
+  client?: T;
+  user?: T;
+  grant?: T;
+  redirectUri?: T;
+  codeChallenge?: T;
+  codeChallengeMethod?: T;
+  resource?: T;
+  scope?: T;
+  expiresAt?: T;
+  usedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-grants_select".
+ */
+export interface OauthGrantsSelect<T extends boolean = true> {
+  client?: T;
+  user?: T;
+  resource?: T;
+  scope?: T;
+  lastUsedAt?: T;
+  revokedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-tokens_select".
+ */
+export interface OauthTokensSelect<T extends boolean = true> {
+  type?: T;
+  tokenHash?: T;
+  grant?: T;
+  client?: T;
+  user?: T;
+  resource?: T;
+  scope?: T;
+  expiresAt?: T;
+  usedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
