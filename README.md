@@ -46,7 +46,9 @@ It is the Payload 4 sibling of the [Payload 3 boilerplate](https://github.com/rp
 - **Hierarchy**: nested categories built on Payload 4's core hierarchy feature (no nested-docs plugin)
 - **Tags**: a tags collection, with a tag picker on posts and a tags tab in the admin sidebar
 - **Folders and grid view**: organize media in folders and browse uploads as a grid
-- **MCP for AI agents**: `/api/mcp` lets AI agents and other MCP clients read and write content as a real user through a user API key, with custom `siteOverview` and `moderateComment` tools
+- **MCP for AI agents**: `/api/mcp` lets ChatGPT and other MCP clients read and write content as a real user, with custom `siteOverview` and `moderateComment` tools
+- **OAuth sign-in for MCP**: the site is its own OAuth 2.1 authorization server. ChatGPT adds it as a custom connector, the user signs in on the site's own login and consent page, and the agent gets exactly that user's permissions. User API keys keep working for other clients
+- **Connected apps**: every user sees which apps may act as them and can revoke each one; admins see all of them
 - **LLM instructions**: per-collection guidance that agents receive over MCP, editable in the admin
 - **Scheduled publishing**: the jobs queue runs inside the server, so "Schedule publish" works on Railway without an external cron
 - **Versions and authorship**: version history and `createdBy`/`updatedBy` are on by default
@@ -95,10 +97,30 @@ See [.env.example](.env.example) for a local starting point.
 
 ## Connect an AI agent (MCP)
 
-1. In the admin, open your user account and generate an API key.
-2. Point any MCP client that supports streamable HTTP at `https://<your-domain>/api/mcp`, with the header `Authorization: users API-Key <your-key>`.
+The site exposes an MCP server at `https://<your-domain>/api/mcp`. Agents act with the permissions of the user they sign in as: they can draft posts and pages but cannot delete them, and they can moderate comments. Everything they change is recorded under that user's name. See [src/plugins/mcp.ts](src/plugins/mcp.ts).
 
-Agents act with that user's permissions. They can draft posts and pages but cannot delete them, and they can moderate comments. See [src/plugins/mcp.ts](src/plugins/mcp.ts).
+### ChatGPT (OAuth)
+
+> **Note:** the OAuth sign-in was made by Fable 5.1 for demonstration purposes only. Use it at your own risk; see the disclaimer in [src/plugins/mcp-oauth/README.md](src/plugins/mcp-oauth/README.md).
+
+1. In ChatGPT, open **Settings → Connectors** and create a custom connector (custom MCP connectors may require ChatGPT's developer mode, under **Advanced**). Enter the MCP server URL `https://<your-domain>/api/mcp` and choose **OAuth** as the authentication. Leave any client ID and secret fields empty: ChatGPT identifies itself with its client ID metadata document, or registers itself dynamically.
+2. When ChatGPT connects, it opens the site's own login page. Sign in with your normal admin or editor account.
+3. On the consent page, check who is asking and where you will be sent back to, then click **Allow**. ChatGPT now works with exactly your permissions.
+
+The same flow works for any MCP client that supports OAuth, for example the MCP Inspector. Discovery documents are served at `/.well-known/oauth-protected-resource` and `/.well-known/oauth-authorization-server`, and the authorization server lives in [src/plugins/mcp-oauth](src/plugins/mcp-oauth). It needs no configuration beyond `NEXT_PUBLIC_SERVER_URL`.
+
+### API keys
+
+Clients that cannot do OAuth keep working as before:
+
+1. In the admin, open your user account and generate an API key.
+2. Point the client at `https://<your-domain>/api/mcp` with the header `Authorization: users API-Key <your-key>`.
+
+### Revoking access
+
+Open your account in the admin (`/admin/account`). Under **Connected apps**, click **Revoke** next to the app. Its tokens stop working immediately, and it has to ask you again. Admins see every user's connected apps under **Connected apps** in the sidebar (`/admin/connected-apps`).
+
+Access tokens expire after one hour and are renewed with rotating refresh tokens, so revoking in the admin is all it takes. Deleting a user also removes their connected apps.
 
 ## Nestwell apartment rentals
 
@@ -147,6 +169,7 @@ The Playwright suite:
 6. Checks the security rules: no public drafts or commenter emails, no self-approved comments, the honeypot, and no demo login
 7. Submits a comment, approves it in the admin and verifies it appears
 8. Calls the MCP endpoint with a user API key
+9. Signs an editor in to the MCP endpoint through OAuth the way ChatGPT does: discovery, client registration, login and consent in the browser, the PKCE code exchange, MCP calls with exactly that user's permissions, token refresh, and revocation from the admin. Then the failure cases: a wrong PKCE verifier, a replayed code, an unregistered redirect URI, a token for another resource, a denied consent, a reused refresh token, and forged consent submissions
 
 Make sure Docker is running, then:
 

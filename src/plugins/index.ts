@@ -12,6 +12,7 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { mcp } from './mcp'
+import { mcpOAuthPlugin } from './mcp-oauth'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Nestwell` : 'Nestwell'
@@ -89,4 +90,6 @@ export const plugins: Plugin[] = [
     },
   }),
   mcp,
+  // Lets ChatGPT and other MCP clients sign in as a user through OAuth (see src/plugins/mcp-oauth)
+  mcpOAuthPlugin(),
 ]
