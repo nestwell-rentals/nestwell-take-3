@@ -18,12 +18,26 @@ export const Logo = ({ className }: Props) => {
       )}
     >
       <svg aria-hidden="true" height="28" viewBox="0 0 28 28" width="28">
-        <rect fill="none" height="24" rx="6" stroke="currentColor" strokeWidth="2.5" width="24" x="2" y="2" />
-        <path d="M9 19V9h5.5a3.5 3.5 0 0 1 0 7H9" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" />
+        <rect
+          fill="none"
+          height="24"
+          rx="6"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          width="24"
+          x="2"
+          y="2"
+        />
+        <path
+          d="M7 13l7-6 7 6v8h-5v-6h-4v6H7z"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2.5"
+        />
       </svg>
-      <span>
-        Payload <span className="opacity-60">4</span>
-      </span>
+      <span>Nestwell</span>
     </span>
   )
 }

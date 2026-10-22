@@ -100,6 +100,18 @@ See [.env.example](.env.example) for a local starting point.
 
 Agents act with that user's permissions. They can draft posts and pages but cannot delete them, and they can moderate comments. See [src/plugins/mcp.ts](src/plugins/mcp.ts).
 
+## Nestwell apartment rentals
+
+The front page and `/listings` show approved apartments. `/listings/[slug]` shows approved or rented apartments, with photos, facts and a rich text description. Prices are displayed as amounts; use one consistent currency for rent and deposit across listings.
+
+Anyone can submit the form at `/list-your-apartment`. Submissions start pending, ignore supplied status/photos/internal notes, and use a honeypot to reject simple bots. There is no public upload. Landlord names, emails, phone numbers and internal notes are visible only to staff. Editors and admins review listings in **Nestwell → Listings**, filter by status, add photos and approve or mark rented. Only admins can delete.
+
+MCP agents can read, create and edit listings. Collection hooks reject approval, rented status and deletion for MCP and API-key requests, even if development MCP access overrides are enabled. Human staff must use their normal admin login to approve listings. Existing posts, seeding and comment moderation remain available.
+
+Schema migrations run through the existing `corepack pnpm start` workflow. After schema changes, run `corepack pnpm generate:types`, `corepack pnpm generate:importmap` and `corepack pnpm typecheck`. The Playwright suite includes the public submission, privacy, moderation and MCP workflows.
+
+A focused collection integration check can run against a **separate empty PostgreSQL database** whose name starts with `nestwell_test`. Set `DATABASE_URL` to that database, run `NODE_ENV=production corepack pnpm migrate`, then `NODE_ENV=production corepack pnpm payload run tests/integration/listings.ts`. The check creates test users and listings; never point it at development or production data.
+
 ## Local Setup
 
 1. Clone or fork this repository. Or deploy on Railway first and then clone your new repository.

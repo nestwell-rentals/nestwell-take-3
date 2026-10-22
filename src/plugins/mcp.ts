@@ -9,6 +9,11 @@ import { defineCollectionTool, defineTool, mcpPlugin } from '@payloadcms/plugin-
  */
 export const mcp = mcpPlugin({
   collections: {
+    listings: {
+      description:
+        'Nestwell apartment rentals. Human staff alone approve listings and mark them rented.',
+      tools: { delete: false, duplicate: false },
+    },
     posts: {
       description: 'Blog posts shown on /posts',
       // Agents can draft and edit, but deleting content stays a human decision
@@ -70,10 +75,25 @@ export const mcp = mcpPlugin({
     }).handler(async ({ authorizedMCP, req }) => {
       const overrideAccess = authorizedMCP.overrideAccess
       const [posts, drafts, pages, pending] = await Promise.all([
-        req.payload.count({ collection: 'posts', overrideAccess, req, where: { _status: { equals: 'published' } } }),
-        req.payload.count({ collection: 'posts', overrideAccess, req, where: { _status: { equals: 'draft' } } }),
+        req.payload.count({
+          collection: 'posts',
+          overrideAccess,
+          req,
+          where: { _status: { equals: 'published' } },
+        }),
+        req.payload.count({
+          collection: 'posts',
+          overrideAccess,
+          req,
+          where: { _status: { equals: 'draft' } },
+        }),
         req.payload.count({ collection: 'pages', overrideAccess, req }),
-        req.payload.count({ collection: 'comments', overrideAccess, req, where: { status: { equals: 'pending' } } }),
+        req.payload.count({
+          collection: 'comments',
+          overrideAccess,
+          req,
+          where: { status: { equals: 'pending' } },
+        }),
       ])
 
       return {
