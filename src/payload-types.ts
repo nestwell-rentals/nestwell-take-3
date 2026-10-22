@@ -62,6 +62,17 @@ export type SupportedTimezones =
   | 'Pacific/Fiji';
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LexicalNodes_AD327369".
+ */
+export type LexicalNodes_AD327369 =
+  | SerializedTextNode
+  | SerializedTabNode
+  | SerializedLineBreakNode
+  | SerializedParagraphNode<LexicalNodes_AD327369>
+  | SerializedAutoLinkNode<LexicalNodes_AD327369, LexicalLinkFields>
+  | SerializedLinkNode<LexicalNodes_AD327369, LexicalLinkFields>;
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "LexicalNodes_17BFECDB".
  */
 export type LexicalNodes_17BFECDB =
@@ -84,17 +95,6 @@ export type LexicalNodes_556A39AF =
   | SerializedHeadingNode<LexicalNodes_556A39AF, 'h2' | 'h3' | 'h4'>
   | SerializedAutoLinkNode<LexicalNodes_556A39AF, LexicalLinkFields>
   | SerializedLinkNode<LexicalNodes_556A39AF, LexicalLinkFields>;
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "LexicalNodes_AD327369".
- */
-export type LexicalNodes_AD327369 =
-  | SerializedTextNode
-  | SerializedTabNode
-  | SerializedLineBreakNode
-  | SerializedParagraphNode<LexicalNodes_AD327369>
-  | SerializedAutoLinkNode<LexicalNodes_AD327369, LexicalLinkFields>
-  | SerializedLinkNode<LexicalNodes_AD327369, LexicalLinkFields>;
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "LexicalNodes_140BC292".
@@ -129,6 +129,7 @@ export interface Config {
   blocks: {};
   collections: {
     folders: Folder;
+    listings: Listing;
     pages: Page;
     posts: Post;
     media: Media;
@@ -154,6 +155,7 @@ export interface Config {
   };
   collectionsSelect: {
     folders: FoldersSelect<false> | FoldersSelect<true>;
+    listings: ListingsSelect<false> | ListingsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -281,52 +283,32 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Review submissions and filter by status. Only approved and rented apartments are public.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
+ * via the `definition` "listings".
  */
-export interface Page {
+export interface Listing {
   id: number;
   title: string;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: LexicalRichText<LexicalNodes_17BFECDB> | null;
-    links?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: number | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: number | Post;
-                } | null);
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    media?: (number | null) | Media;
-  };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
   slug: string;
+  status: 'pending' | 'approved' | 'rejected' | 'rented';
+  monthlyRent: number;
+  deposit: number;
+  availableFrom: string;
+  streetAddress: string;
+  city: string;
+  size: number;
+  rooms: number;
+  furnished?: boolean | null;
+  petsAllowed?: boolean | null;
+  description: LexicalRichText<LexicalNodes_AD327369>;
+  photos?: (number | Media)[] | null;
+  landlordName: string;
+  landlordEmail: string;
+  landlordPhone: string;
+  internalNotes?: string | null;
+  website?: string | null;
   createdBy?: {
     relationTo: 'users';
     value: number | User;
@@ -337,53 +319,6 @@ export interface Page {
   } | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: number;
-  title: string;
-  heroImage?: (number | null) | Media;
-  content: LexicalRichText<LexicalNodes_140BC292>;
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
-  comments?: {
-    docs?: (number | Comment)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (number | User)[] | null;
-  populatedAuthors?:
-    | {
-        id?: string | null;
-        name?: string | null;
-      }[]
-    | null;
-  _h_tags?: (number | Tag)[] | null;
-  slug: string;
-  createdBy?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
-  updatedBy?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -497,6 +432,111 @@ export interface Media {
       _objectKey?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  hero: {
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    richText?: LexicalRichText<LexicalNodes_17BFECDB> | null;
+    links?:
+      | {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: number | Post;
+                } | null);
+            url?: string | null;
+            label: string;
+            /**
+             * Choose how the link should be rendered.
+             */
+            appearance?: ('default' | 'outline') | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    media?: (number | null) | Media;
+  };
+  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  slug: string;
+  createdBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  updatedBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  heroImage?: (number | null) | Media;
+  content: LexicalRichText<LexicalNodes_140BC292>;
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
+  comments?: {
+    docs?: (number | Comment)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  _h_tags?: (number | Tag)[] | null;
+  slug: string;
+  createdBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  updatedBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1078,6 +1118,10 @@ export interface PayloadLockedDocument {
         value: number | Folder;
       } | null)
     | ({
+        relationTo: 'listings';
+        value: number | Listing;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1198,6 +1242,35 @@ export interface FoldersSelect<T extends boolean = true> {
   createdAt?: T;
   _h_slugPath?: T;
   _h_titlePath?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings_select".
+ */
+export interface ListingsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  status?: T;
+  monthlyRent?: T;
+  deposit?: T;
+  availableFrom?: T;
+  streetAddress?: T;
+  city?: T;
+  size?: T;
+  rooms?: T;
+  furnished?: T;
+  petsAllowed?: T;
+  description?: T;
+  photos?: T;
+  landlordName?: T;
+  landlordEmail?: T;
+  landlordPhone?: T;
+  internalNotes?: T;
+  website?: T;
+  createdBy?: T;
+  updatedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2057,6 +2130,7 @@ export interface CollectionQueryWidget {
     title?: string | null;
     relatedCollection:
       | 'folders'
+      | 'listings'
       | 'pages'
       | 'posts'
       | 'media'
@@ -2092,6 +2166,7 @@ export interface ActivityWidget {
     excludedCollections?:
       | (
           | 'folders'
+          | 'listings'
           | 'pages'
           | 'posts'
           | 'media'
@@ -2236,14 +2311,6 @@ export interface SerializedParagraphNode<TChildren> extends SerializedLexicalEle
   textStyle: string;
 }
 
-export interface SerializedHeadingNode<
-  TChildren,
-  TTag extends 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6',
-> extends SerializedLexicalElementBase<TChildren> {
-  type: 'heading';
-  tag: TTag;
-}
-
 export interface LexicalLinkFields {
   [k: string]: unknown;
   doc?: {
@@ -2275,6 +2342,14 @@ export interface LexicalRichText<TNode> {
     /** @deprecated Ignored when loading. Typed as required only to match Lexical's types: rich text sent through the API, CLI or MCP may not contain it. */
     version: number;
   };
+}
+
+export interface SerializedHeadingNode<
+  TChildren,
+  TTag extends 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6',
+> extends SerializedLexicalElementBase<TChildren> {
+  type: 'heading';
+  tag: TTag;
 }
 
 export interface SerializedHorizontalRuleNode {

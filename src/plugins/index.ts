@@ -14,7 +14,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { mcp } from './mcp'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload 4 Website` : 'Payload 4 Website'
+  return doc?.title ? `${doc.title} | Nestwell` : 'Nestwell'
 }
 
 const generateURL: GenerateURL<Post | Page> = ({ collectionSlug, doc }) => {

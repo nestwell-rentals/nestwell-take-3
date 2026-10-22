@@ -9,6 +9,7 @@ import { Comments } from "./collections/Comments";
 import { Media, mediaSharpOptions } from "./collections/Media";
 import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
+import { Listings } from "./collections/Listings";
 import { Tags } from "./collections/Tags";
 import { Users } from "./collections/Users";
 import { Footer } from "./Footer/config";
@@ -99,6 +100,7 @@ export default buildConfig({
         },
       ],
     },
+    Listings,
     Pages,
     Posts,
     Media,
